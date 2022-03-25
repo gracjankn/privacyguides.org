@@ -50,12 +50,10 @@ Native implementations showed up in [iOS 14](https://en.wikipedia.org/wiki/IOS_1
 
 To understand more graphically we produced this chart:
 
-<div style="text-align: center">
-  <picture>
-    <source srcset="/assets/img/dns/dns-dark.svg" media="(prefers-color-scheme: dark)">
-    <img class="flowchart" src="/assets/img/dns/dns.svg" alt="DNS flowchart">
-  </picture>
-</div>
+<picture>
+  <source srcset="/assets/img/dns/dns-dark.svg" media="(prefers-color-scheme: dark)">
+  <img class="flowchart" src="/assets/img/dns/dns.svg" alt="DNS flowchart">
+</picture>
 
 ## What is DNSSEC and when is it used?
 
@@ -88,7 +86,7 @@ Linux distributions don't have this by default, so installing [dnscrypt-proxy](h
 
 {% include recommendation-table.html data='dns' %}
 
-## Criteria
+## DNS server criteria
 - Must support [DNSSEC](/dns/#what-is-dnssec-and-when-is-it-used)
 - Must have [anycast](https://en.wikipedia.org/wiki/Anycast#Addressing_methods) support
 - [QNAME Minimization](/dns/#what-is-qname-minimization)
