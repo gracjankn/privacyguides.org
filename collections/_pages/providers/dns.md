@@ -22,7 +22,7 @@ Unencrypted DNS is able to be easily **surveilled** and **modified** in transit.
    dig +noall +answer privacyguides.org @8.8.8.8
    ```
 
-3. Using [Wireshark](https://en.wikipedia.org/wiki/Wireshark) we can analyse the results. Enterprise filtering and monitoring solutions (such as those purchased by governments and enterprise) can do the process automatically and without human interaction.
+3. Using [Wireshark](https://en.wikipedia.org/wiki/Wireshark) we can analyse the results. The top portion of the window contains the "[frames](https://en.wikipedia.org/wiki/Ethernet_frame)", while the bottom portion contains all of the data about the selected frame. Enterprise filtering and monitoring solutions (such as those purchased by governments and enterprise) can do the process automatically and without human interaction and can aggregate those frames to produce statistical data useful to the network observer.
 
 {% include table-unencrypted-dns.html %}
 
@@ -42,10 +42,35 @@ Encrypted DNS can refer to one of a many different protocols, the ones below lik
 
 Native implementations showed up in [iOS 14](https://en.wikipedia.org/wiki/IOS_14), [macOS 11](https://en.wikipedia.org/wiki/MacOS_11), [Microsoft Windows](https://docs.microsoft.com/en-us/windows-server/networking/dns/doh-client-support), and Android 13 (however it won't be enabled [by default](https://android-review.googlesource.com/c/platform/packages/modules/DnsResolver/+/1833144)). General linux desktop support is waiting on the systemd [implementation](https://github.com/systemd/systemd/issues/8639) so installing third party software is still required as described [below](/dns/#linux).
 
-## Why should I use encrypted DNS?
+## What can an outside party see?
+If we run the modify the above tests to work with a DoH request:
 
+1. Firstly start `tcpdump`:
+   ```
+   sudo tcpdump host 1.1.1.1 and port 443 -w dns_doh.pcap
+   ```
+
+2. Secondly make a request with `curl`:
+   ```
+   curl -vI --doh-url https://1.1.1.1/dns-query https://privacyguides.org
+   ```
+
+If we then look at the output of the capture in Wireshark, we will see the [connection establishment](https://en.wikipedia.org/wiki/Transmission_Control_Protocol#Connection_establishment) and [TLS handshake](https://www.cloudflare.com/learning/ssl/what-happens-in-a-tls-handshake/) that occurs with any encrypted connection. When looking at the application data packets that follow, none of them contain the domain we requested or the IP address returned.
 
 ## Why **shouldn't** I use encrypted DNS?
+At this point you'd probably be thinking that there is "increased privacy" however, that isn't necessarily the case. We don't make DNS lookups and then do nothing with the returned result. After we know what the privacyguides.org IP address is, we want to see the page that we're looking at.
+
+1. So let's start capturing again with `tcpdump`:
+   ```
+   sudo tcpdump host 198.98.54.105 and port 443 -w pg.pcap
+   ```
+
+2. Then we visit https://privacyguides.org
+
+3. Then we analyze pg.pcap in Wireshark.
+
+Again you'll see the TCP connection establishment, followed by the TLS handshake for the Privacy Guides website. Around frame 5. you'll see a "Client Hello".
+
 
 
 To understand more graphically we produced this chart:
@@ -54,6 +79,11 @@ To understand more graphically we produced this chart:
   <source srcset="/assets/img/dns/dns-dark.svg" media="(prefers-color-scheme: dark)">
   <img class="flowchart" src="/assets/img/dns/dns.svg" alt="DNS flowchart">
 </picture>
+
+
+## Why should I use encrypted DNS?
+
+
 
 ## What is DNSSEC and when is it used?
 
